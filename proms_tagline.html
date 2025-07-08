@@ -1,42 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>ProMS Tagline Submission</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 500px;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      max-width: 600px;
       margin: auto;
+      background-color: #f9f9f9;
+      color: #333;
     }
+
+    h2 {
+      color: #008080;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 15px 0 5px;
+    }
+
     input, textarea, button {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      padding: 12px;
+      margin-bottom: 15px;
       font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
+
+    button {
+      background-color: #008080;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #006666;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
     #message {
       margin-top: 20px;
+      font-weight: bold;
+      color: green;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h2>💡 Share Your Tagline Idea for ProMS</h2>
-  <form id="taglineForm">
-    <label>Staff ID:</label>
-    <input type="text" name="staffId" required>
+  <h2>Got a great idea?</h2>
+  <p style="text-align: center;">Share your tagline or motto for our project,<br><strong>the Procurement Management Solution (ProMS)</strong>.</p>
 
-    <label>Name:</label>
+  <form id="taglineForm">
+    <label for="name">Name:</label>
     <input type="text" name="name" required>
 
-    <label>Your tagline or motto idea:</label>
+    <label for="tagline">Tagline:</label>
     <textarea name="tagline" rows="4" required></textarea>
 
     <button type="submit">Submit</button>
   </form>
 
   <div id="message"></div>
+
+  <div class="footer">
+    <p>Your Ideas Matter</p>
+    <p>© 2025 ProMS Project Team. All rights reserved.<br>Impressive Communication Sdn Bhd</p>
+  </div>
 
   <script>
     const form = document.getElementById('taglineForm');
@@ -46,30 +92,29 @@
       e.preventDefault();
 
       const data = new FormData(form);
-      const staffId = data.get("staffId");
       const name = data.get("name");
       const tagline = data.get("tagline");
 
-      fetch("https://script.google.com/macros/s/AKfycbzDGvwGnsuQWRBrLwvB3kwAnqjh3y-FEQgR64wExbybEvNuDHNItZg2XI8zHBSWsbig/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbxvOfy_ThaonBAgGQ5Qrn05J2OAouINwVIQUS7epJCl77GogUZ1yvwP_CV7tFECgcCw/exec", {
         method: "POST",
         body: new URLSearchParams({
-          staffId: staffId,
+          staffId: "-", // not used in UI, keep for compatibility
           name: name,
           tagline: tagline
         })
       })
-        .then(response => {
-          if (response.ok) {
-            message.innerHTML = `<p>✅ Thank you, <strong>${name}</strong>! Your idea has been recorded.</p>`;
-            form.reset();
-          } else {
-            message.innerHTML = `<p style="color:red">❌ Submission failed. Please try again.</p>`;
-          }
-        })
-        .catch(error => {
-          console.error("Submission error:", error);
-          message.innerHTML = `<p style="color:red">⚠️ Network error. Please try again later.</p>`;
-        });
+      .then(response => {
+        if (response.ok) {
+          message.innerHTML = `✅ Thanks, <strong>${name}</strong>! Your idea has been recorded. It’s now safe to close this page.`;
+          form.reset();
+        } else {
+          message.innerHTML = `❌ Submission failed. Please try again.`;
+        }
+      })
+      .catch(error => {
+        console.error("Submission error:", error);
+        message.innerHTML = `⚠️ Network error. Please try again later.`;
+      });
     });
   </script>
 </body>
