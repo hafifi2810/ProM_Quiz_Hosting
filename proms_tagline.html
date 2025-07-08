@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ProMS Tagline Submission</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>💡 Share Your Tagline Idea for ProMS</h2>
+  <form id="taglineForm">
+    <label>Staff ID:</label>
+    <input type="text" name="staffId" required>
+
+    <label>Name:</label>
+    <input type="text" name="name" required>
+
+    <label>Your tagline or motto idea:</label>
+    <textarea name="tagline" rows="4" required></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="message"></div>
+
+  <script>
+    const form = document.getElementById('taglineForm');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+      const staffId = data.get("staffId");
+      const name = data.get("name");
+      const tagline = data.get("tagline");
+
+      // Example: Display a simple thank you message
+      message.innerHTML = `<p>Thank you, <strong>${name}</strong>! Your idea has been recorded.</p>`;
+
+      // TODO: Connect to Google Sheet or email backend if needed
+      form.reset();
+    });
+  </script>
+</body>
+</html>
