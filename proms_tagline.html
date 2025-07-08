@@ -41,6 +41,21 @@
       const name = data.get("name");
       const tagline = data.get("tagline");
 
+      fetch("https://script.google.com/macros/s/AKfycbzvPzyvX79O2qceqch05uNk0uJPnCubwRoaDkzXYmKshImegopNakfkNvVCnLz3SW1h/exec", {
+        method: "POST",
+        body: new URLSearchParams({
+          staffId: staffId,
+          name: name,
+          tagline: tagline
+        })
+      }).then(response => {
+        message.innerHTML = `<p>Thank you, <strong>${name}</strong>! Your idea has been recorded.</p>`;
+        form.reset();
+      }).catch(error => {
+        message.innerHTML = `<p style="color:red">Failed to submit. Try again.</p>`;
+    });
+  });
+      
       // Example: Display a simple thank you message
       message.innerHTML = `<p>Thank you, <strong>${name}</strong>! Your idea has been recorded.</p>`;
 
