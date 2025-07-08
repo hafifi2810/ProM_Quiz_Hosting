@@ -46,6 +46,7 @@
       width: 100%;
       height: 400px;
       display: block;
+      border: 1px dashed #ccc;
     }
   </style>
 </head>
@@ -90,7 +91,7 @@
             tbody.appendChild(tr);
           });
 
-          // Word processing
+          // Word frequency
           const wordMap = new Map();
           data.forEach(row => {
             const line = row["Tagline"] || "";
@@ -105,22 +106,26 @@
           let wordList = Array.from(wordMap.entries());
           console.log("🧠 Word list:", wordList);
 
-          // Fallback if empty
+          // Fallback words if list is empty
           if (wordList.length === 0) {
-            wordList = [["ProMS", 5], ["smart", 4], ["future", 3]];
+            wordList = [["ProMS", 10], ["Smart", 8], ["Fast", 6], ["Transparent", 4]];
           }
 
-          const canvas = document.getElementById("wordCloud");
-          canvas.width = 800;
-          canvas.height = 400;
+          // Delay render to fix layout issue
+          setTimeout(() => {
+            const canvas = document.getElementById("wordCloud");
+            canvas.width = 800;
+            canvas.height = 400;
+            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
-          WordCloud(canvas, {
-            list: wordList,
-            gridSize: 12,
-            weightFactor: 8,
-            backgroundColor: "#fff",
-            color: () => '#' + Math.floor(Math.random() * 16777215).toString(16)
-          });
+            WordCloud(canvas, {
+              list: wordList,
+              gridSize: 12,
+              weightFactor: 8,
+              color: () => '#' + Math.floor(Math.random()*16777215).toString(16),
+              backgroundColor: '#fff'
+            });
+          }, 200);
         })
         .catch(err => {
           console.error("❌ Fetch failed:", err);
