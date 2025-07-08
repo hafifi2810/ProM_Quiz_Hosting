@@ -26,7 +26,7 @@
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       margin: 5px 0;
     }
 
@@ -36,7 +36,7 @@
     }
 
     #refreshBtn {
-      padding: 6px 16px;
+      padding: 8px 18px;
       font-size: 1rem;
       background: #007bff;
       color: #fff;
@@ -54,7 +54,7 @@
     .main-container {
       display: flex;
       width: 100%;
-      max-width: 1100px;
+      max-width: 1800px;
       flex: 1;
       gap: 20px;
     }
@@ -67,7 +67,7 @@
     }
 
     .right-panel {
-      flex: 1;
+      flex: 1.2;
       display: flex;
       flex-direction: column;
     }
@@ -81,10 +81,24 @@
       overflow: hidden;
     }
 
+    .top-card {
+      flex: 0 0 35%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     #countValue {
-      font-size: 2.5rem;
+      font-size: 5rem;
       color: #007bff;
       text-align: center;
+      font-weight: bold;
+    }
+
+    .bottom-card {
+      flex: 1;
+      overflow: auto;
     }
 
     table {
@@ -101,17 +115,8 @@
 
     #wordCloud {
       width: 100%;
-      height: 100%;
+      height: 400px;
       border: 1px dashed #ccc;
-    }
-
-    .top-card {
-      flex: 0 0 35%;
-    }
-
-    .bottom-card {
-      flex: 1;
-      overflow: auto;
     }
   </style>
 </head>
@@ -141,9 +146,9 @@
 
     <!-- RIGHT SIDE -->
     <div class="right-panel">
-      <div class="card" style="height: 100%;">
+      <div class="card">
         <h2>Word Cloud</h2>
-        <canvas id="wordCloud" width="500" height="400"></canvas>
+        <canvas id="wordCloud" width="800" height="400"></canvas>
       </div>
     </div>
   </div>
@@ -206,7 +211,7 @@
 
           const canvas = document.getElementById("wordCloud");
           canvas.width = canvas.offsetWidth;
-          canvas.height = canvas.offsetHeight;
+          canvas.height = 400;
           canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
           WordCloud(canvas, {
@@ -223,7 +228,7 @@
     }
 
     document.getElementById("refreshBtn").addEventListener("click", () => fetchData(true));
-    fetchData(true); // manual only
+    fetchData(true); // manual refresh only
   </script>
 </body>
 </html>
