@@ -7,47 +7,32 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.1/wordcloud2.min.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
+    html, body {
       margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
       background: #f4f6f8;
-      padding: 20px;
       color: #333;
+      overflow: hidden; /* prevent scroll */
+    }
+    body {
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 10px;
+      height: 100vh;
+      box-sizing: border-box;
     }
-    .dashboard {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      max-width: 1200px;
-      width: 100%;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    #countValue {
-      font-size: 3rem;
-      color: #007bff;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 8px;
-      border-bottom: 1px solid #ddd;
+    h1 {
+      font-size: 1.5rem;
+      margin: 10px 0;
     }
     #controls {
-      margin: 20px 0;
+      margin-bottom: 10px;
       text-align: center;
     }
     #refreshBtn {
-      padding: 10px 20px;
+      padding: 6px 16px;
       font-size: 1rem;
       background: #007bff;
       color: #fff;
@@ -56,12 +41,50 @@
       cursor: pointer;
     }
     #lastUpdated {
-      margin-top: 10px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #666;
+      margin-top: 5px;
     }
+
+    .dashboard {
+      display: flex;
+      width: 100%;
+      max-width: 1100px;
+      gap: 16px;
+      justify-content: space-between;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+      flex: 1;
+    }
+    #countValue {
+      font-size: 2.5rem;
+      color: #007bff;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    #cloudContainer {
+      margin-top: 10px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
     #wordCloud {
       width: 100%;
+      height: 300px;
       display: block;
       border: 1px dashed #ccc;
     }
@@ -89,9 +112,9 @@
     </div>
   </div>
 
-  <div class="card" style="width: 100%; margin-top: 20px;">
+  <div class="card" id="cloudContainer">
     <h2>Word Cloud</h2>
-    <canvas id="wordCloud" width="800"></canvas>
+    <canvas id="wordCloud" width="800" height="300"></canvas>
   </div>
 
   <script>
@@ -121,10 +144,10 @@
 
           document.getElementById("lastUpdated").textContent = "Last updated: " + formatTime();
 
-          // Update count
+          // Count
           document.getElementById("countValue").textContent = data.length;
 
-          // Update table
+          // Table
           const tbody = document.getElementById("latestTable");
           tbody.innerHTML = "";
           data.slice(-5).reverse().forEach(row => {
@@ -133,7 +156,7 @@
             tbody.appendChild(tr);
           });
 
-          // Word frequency
+          // Word cloud
           const wordMap = new Map();
           data.forEach(row => {
             const text = row["Tagline"] || "";
@@ -150,18 +173,14 @@
             wordList = [["ProMS", 5], ["Smart", 4], ["Future", 3]];
           }
 
-          // Resize canvas based on word count
           const canvas = document.getElementById("wordCloud");
-          const desiredHeight = Math.min(Math.max(wordList.length * 20, 200), 600);
-          canvas.width = 800;
-          canvas.height = desiredHeight;
           canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
           WordCloud(canvas, {
             list: wordList,
             gridSize: 12,
             weightFactor: 8,
-            color: () => '#' + Math.floor(Math.random() * 16777215).toString(16),
+            color: () => '#' + Math.floor(Math.random()*16777215).toString(16),
             backgroundColor: '#fff'
           });
         })
@@ -171,9 +190,8 @@
     }
 
     document.getElementById("refreshBtn").addEventListener("click", () => fetchData(true));
-
-    fetchData();
-    setInterval(fetchData, 3000); // Only redraw if new data
+    fetchData(true); // run once on load only
+    // no interval = manual only
   </script>
 </body>
 </html>
