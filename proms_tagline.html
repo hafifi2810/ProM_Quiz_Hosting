@@ -4,12 +4,20 @@
   <title>ProMS Tagline Submission</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
     input, textarea, button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
       font-size: 1rem;
+    }
+    #message {
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -34,33 +42,34 @@
     const form = document.getElementById('taglineForm');
     const message = document.getElementById('message');
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
+
       const data = new FormData(form);
       const staffId = data.get("staffId");
       const name = data.get("name");
       const tagline = data.get("tagline");
 
-      fetch("https://script.google.com/macros/s/AKfycbxvOfy_ThaonBAgGQ5Qrn05J2OAouINwVIQUS7epJCl77GogUZ1yvwP_CV7tFECgcCw/exec", {
+      fetch("https://script.google.com/macros/s/YOUR_WEB_APP_URL/exec", {
         method: "POST",
         body: new URLSearchParams({
           staffId: staffId,
           name: name,
           tagline: tagline
         })
-      }).then(response => {
-        message.innerHTML = `<p>Thank you, <strong>${name}</strong>! Your idea has been recorded.</p>`;
-        form.reset();
-      }).catch(error => {
-        message.innerHTML = `<p style="color:red">Failed to submit. Try again.</p>`;
-    });
-  });
-      
-      // Example: Display a simple thank you message
-      message.innerHTML = `<p>Thank you, <strong>${name}</strong>! Your idea has been recorded.</p>`;
-
-      // TODO: Connect to Google Sheet or email backend if needed
-      form.reset();
+      })
+        .then(response => {
+          if (response.ok) {
+            message.innerHTML = `<p>✅ Thank you, <strong>${name}</strong>! Your idea has been recorded.</p>`;
+            form.reset();
+          } else {
+            message.innerHTML = `<p style="color:red">❌ Submission failed. Please try again.</p>`;
+          }
+        })
+        .catch(error => {
+          console.error("Submission error:", error);
+          message.innerHTML = `<p style="color:red">⚠️ Network error. Please try again later.</p>`;
+        });
     });
   </script>
 </body>
