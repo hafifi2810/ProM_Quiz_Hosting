@@ -102,34 +102,46 @@
           const latest = data.slice(-5).reverse();
           latest.forEach(row => {
             const tr = document.createElement("tr");
-            tr.innerHTML = `<td>${row.Name || "-"}</td><td>${row.Tagline || "-"}</td>`;
+            tr.innerHTML = `<td>${row["Name"] || "-"}</td><td>${row["Tagline"] || "-"}</td>`;
             tbody.appendChild(tr);
           });
 
-          // Prepare word frequency
+          // Prepare word frequency (basic tokenizer)
           const wordMap = new Map();
           data.forEach(row => {
-            const words = (row.Tagline || "").toLowerCase().replace(/[^a-z0-9 ]/g, "").split(" ");
-            words.forEach(word => {
-              if (word.length > 3) {
+            const text = row["Tagline"] || "";
+            const words = text.toLowerCase().match(/\b\w{4,}\b/g); // words >= 4 chars
+            if (words) {
+              words.forEach(word => {
                 wordMap.set(word, (wordMap.get(word) || 0) + 1);
-              }
-            });
+              });
+            }
           });
 
-          const wordArray = Array.from(wordMap.entries());
-          WordCloud(document.getElementById("wordCloud"), {
-            list: wordArray,
-            gridSize: 12,
-            weightFactor: 8,
-            color: () => '#' + Math.floor(Math.random()*16777215).toString(16),
-            backgroundColor: '#fff'
-          });
+          const wordArray = Array.from(wordMap.entries()).sort((a, b) => b[1] - a[1]);
+
+          const canvas = document.getElementById("wordCloud");
+          canvas.innerHTML = ""; // Clear old cloud
+
+          if (wordArray.length > 0) {
+            WordCloud(canvas, {
+              list: wordArray,
+              gridSize: 12,
+              weightFactor: 8,
+              color: () => '#' + Math.floor(Math.random()*16777215).toString(16),
+              backgroundColor: '#fff'
+            });
+          } else {
+            canvas.innerHTML = "<p style='text-align:center;color:#888'>No words yet</p>";
+          }
+        })
+        .catch(err => {
+          console.error("Fetch failed:", err);
         });
     }
 
     fetchData();
-    setInterval(fetchData, 10000); // Refresh every 10 seconds
+    setInterval(fetchData, 3000); // Refresh every 3 seconds
   </script>
 </body>
 </html>
