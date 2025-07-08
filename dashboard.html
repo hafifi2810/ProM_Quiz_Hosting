@@ -42,9 +42,26 @@
       padding: 8px;
       border-bottom: 1px solid #ddd;
     }
+    #controls {
+      margin: 20px 0;
+      text-align: center;
+    }
+    #refreshBtn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #lastUpdated {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #666;
+    }
     #wordCloud {
       width: 100%;
-      height: 400px;
       display: block;
       border: 1px dashed #ccc;
     }
@@ -52,6 +69,12 @@
 </head>
 <body>
   <h1>📊 ProMS Live Dashboard</h1>
+
+  <div id="controls">
+    <button id="refreshBtn">🔄 Refresh Now</button>
+    <div id="lastUpdated">Last updated: -</div>
+  </div>
+
   <div class="dashboard">
     <div class="card">
       <h2>Total Tagline Submissions</h2>
@@ -68,18 +91,37 @@
 
   <div class="card" style="width: 100%; margin-top: 20px;">
     <h2>Word Cloud</h2>
-    <canvas id="wordCloud" width="800" height="400"></canvas>
+    <canvas id="wordCloud" width="800"></canvas>
   </div>
 
   <script>
     const endpoint = "https://script.google.com/macros/s/AKfycbwXJtRU0ypgQiAE2gSqGCDFq_6Zkd7qULk3SuQP3dXVDSXG74AzehgItupwLqsmTHEp/exec";
+    let lastHash = "";
 
-    function fetchData() {
+    function getHash(data) {
+      const lastRow = data[data.length - 1];
+      const lastValue = JSON.stringify(lastRow);
+      return data.length + "_" + btoa(unescape(encodeURIComponent(lastValue))).slice(-10);
+    }
+
+    function formatTime() {
+      const now = new Date();
+      return now.toLocaleString('en-GB', { hour12: false });
+    }
+
+    function fetchData(force = false) {
       fetch(endpoint)
         .then(r => r.json())
         .then(data => {
           if (!Array.isArray(data)) return;
 
+          const currentHash = getHash(data);
+          if (!force && currentHash === lastHash) return;
+          lastHash = currentHash;
+
+          document.getElementById("lastUpdated").textContent = "Last updated: " + formatTime();
+
+          // Update count
           document.getElementById("countValue").textContent = data.length;
 
           // Update table
@@ -94,8 +136,8 @@
           // Word frequency
           const wordMap = new Map();
           data.forEach(row => {
-            const line = row["Tagline"] || "";
-            const words = line.toLowerCase().match(/\b[a-z]{3,}\b/g);
+            const text = row["Tagline"] || "";
+            const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g);
             if (words) {
               words.forEach(word => {
                 wordMap.set(word, (wordMap.get(word) || 0) + 1);
@@ -104,36 +146,34 @@
           });
 
           let wordList = Array.from(wordMap.entries());
-          console.log("🧠 Word list:", wordList);
-
-          // Fallback words if list is empty
           if (wordList.length === 0) {
-            wordList = [["ProMS", 10], ["Smart", 8], ["Fast", 6], ["Transparent", 4]];
+            wordList = [["ProMS", 5], ["Smart", 4], ["Future", 3]];
           }
 
-          // Delay render to fix layout issue
-          setTimeout(() => {
-            const canvas = document.getElementById("wordCloud");
-            canvas.width = 800;
-            canvas.height = 400;
-            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+          // Resize canvas based on word count
+          const canvas = document.getElementById("wordCloud");
+          const desiredHeight = Math.min(Math.max(wordList.length * 20, 200), 600);
+          canvas.width = 800;
+          canvas.height = desiredHeight;
+          canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
-            WordCloud(canvas, {
-              list: wordList,
-              gridSize: 12,
-              weightFactor: 8,
-              color: () => '#' + Math.floor(Math.random()*16777215).toString(16),
-              backgroundColor: '#fff'
-            });
-          }, 200);
+          WordCloud(canvas, {
+            list: wordList,
+            gridSize: 12,
+            weightFactor: 8,
+            color: () => '#' + Math.floor(Math.random() * 16777215).toString(16),
+            backgroundColor: '#fff'
+          });
         })
         .catch(err => {
           console.error("❌ Fetch failed:", err);
         });
     }
 
+    document.getElementById("refreshBtn").addEventListener("click", () => fetchData(true));
+
     fetchData();
-    setInterval(fetchData, 3000);
+    setInterval(fetchData, 3000); // Only redraw if new data
   </script>
 </body>
 </html>
