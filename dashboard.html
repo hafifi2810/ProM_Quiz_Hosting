@@ -81,7 +81,7 @@
 
   <div class="card" style="width: 100%; max-width: 1200px; margin-top: 20px;">
     <h2>Word Cloud</h2>
-    <div id="wordCloud"></div>
+    <canvas id="wordCloud"></canvas>
   </div>
 
   <script>
@@ -106,11 +106,11 @@
             tbody.appendChild(tr);
           });
 
-          // Prepare word frequency (basic tokenizer)
+          // Prepare word frequency
           const wordMap = new Map();
           data.forEach(row => {
             const text = row["Tagline"] || "";
-            const words = text.toLowerCase().match(/\b\w{4,}\b/g); // words >= 4 chars
+            const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g); // words >= 3 letters
             if (words) {
               words.forEach(word => {
                 wordMap.set(word, (wordMap.get(word) || 0) + 1);
@@ -121,7 +121,8 @@
           const wordArray = Array.from(wordMap.entries()).sort((a, b) => b[1] - a[1]);
 
           const canvas = document.getElementById("wordCloud");
-          canvas.innerHTML = ""; // Clear old cloud
+          canvas.width = canvas.offsetWidth || 800;
+          canvas.height = canvas.offsetHeight || 400;
 
           if (wordArray.length > 0) {
             WordCloud(canvas, {
@@ -132,7 +133,11 @@
               backgroundColor: '#fff'
             });
           } else {
-            canvas.innerHTML = "<p style='text-align:center;color:#888'>No words yet</p>";
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#888";
+            ctx.fillText("No valid words found", 20, 50);
           }
         })
         .catch(err => {
