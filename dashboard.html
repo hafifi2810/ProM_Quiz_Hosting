@@ -126,7 +126,7 @@
       text-align: center;
       font-size: 0.85rem;
       color: #999;
-      padding: 8px 0;
+      padding: 10px 0;
       border-top: 1px solid #ddd;
     }
   </style>
@@ -165,7 +165,7 @@
   </div>
 
   <footer>
-    © 2025 ProMS Team. All rights reserved.
+    © 2025 Impressive Communication Sdn Bhd. All rights reserved.
   </footer>
 
   <script>
@@ -207,7 +207,7 @@
             tbody.appendChild(tr);
           });
 
-          // Word Cloud: Build word frequency map
+          // Word Cloud
           const wordMap = new Map();
           data.forEach(row => {
             const text = row["Tagline"] || "";
@@ -220,24 +220,25 @@
           });
 
           let wordList = Array.from(wordMap.entries());
-          if (wordList.length === 0) {
-            wordList = [["ProMS", 5], ["Smart", 4], ["Future", 3]];
-          }
-
-          // ✅ Limit to top 30 words only
-          wordList = wordList.slice(0, 30);
+          wordList = wordList.slice(0, 30); // show only top 30
 
           const canvas = document.getElementById("wordCloud");
-          canvas.width = canvas.offsetWidth;
-          canvas.height = 400;
-          canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          // ✅ Word Cloud with minimum size scaling
+          if (wordList.length === 0) {
+            ctx.font = "16px Segoe UI";
+            ctx.fillStyle = "#999";
+            ctx.textAlign = "center";
+            ctx.fillText("No words to display yet.", canvas.width / 2, canvas.height / 2);
+            return;
+          }
+
           WordCloud(canvas, {
             list: wordList,
             gridSize: 12,
             weightFactor: function (size) {
-              return Math.max(10, size * 8); // Ensure no word is too small
+              return Math.max(10, size * 8); // minimum size
             },
             color: () => '#' + Math.floor(Math.random() * 16777215).toString(16),
             backgroundColor: '#fff'
@@ -249,7 +250,7 @@
     }
 
     document.getElementById("refreshBtn").addEventListener("click", () => fetchData(true));
-    fetchData(true); // Manual-only on load
+    fetchData(true); // manual refresh only
   </script>
 </body>
 </html>
