@@ -207,7 +207,7 @@
             tbody.appendChild(tr);
           });
 
-          // Word Cloud
+          // Word Cloud: Build word frequency map
           const wordMap = new Map();
           data.forEach(row => {
             const text = row["Tagline"] || "";
@@ -224,16 +224,22 @@
             wordList = [["ProMS", 5], ["Smart", 4], ["Future", 3]];
           }
 
+          // ✅ Limit to top 30 words only
+          wordList = wordList.slice(0, 30);
+
           const canvas = document.getElementById("wordCloud");
           canvas.width = canvas.offsetWidth;
           canvas.height = 400;
           canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
+          // ✅ Word Cloud with minimum size scaling
           WordCloud(canvas, {
             list: wordList,
             gridSize: 12,
-            weightFactor: 8,
-            color: () => '#' + Math.floor(Math.random()*16777215).toString(16),
+            weightFactor: function (size) {
+              return Math.max(10, size * 8); // Ensure no word is too small
+            },
+            color: () => '#' + Math.floor(Math.random() * 16777215).toString(16),
             backgroundColor: '#fff'
           });
         })
@@ -243,7 +249,7 @@
     }
 
     document.getElementById("refreshBtn").addEventListener("click", () => fetchData(true));
-    fetchData(true); // manual only
+    fetchData(true); // Manual-only on load
   </script>
 </body>
 </html>
