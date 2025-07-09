@@ -219,8 +219,7 @@
             }
           });
 
-          let wordList = Array.from(wordMap.entries());
-          wordList = wordList.slice(0, 30); // show only top 30
+          let wordList = Array.from(wordMap.entries()).sort((a, b) => b[1] - a[1]).reverse().slice(0, 30);
 
           const canvas = document.getElementById("wordCloud");
           const ctx = canvas.getContext("2d");
@@ -234,12 +233,14 @@
             return;
           }
 
+          const maxFreq = Math.max(...wordList.map(([_, count]) => count));
+          const scaledList = wordList.map(([word, count]) => [word, 10 + (count / maxFreq) * 60]);
+
           WordCloud(canvas, {
-            list: wordList,
-            gridSize: 12,
-            weightFactor: function (size) {
-              return Math.max(10, size * 8); // minimum size
-            },
+            list: scaledList,
+            gridSize: 8,
+            weightFactor: size => size,
+            rotateRatio: 0.2,
             color: () => '#' + Math.floor(Math.random() * 16777215).toString(16),
             backgroundColor: '#fff'
           });
